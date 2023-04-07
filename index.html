@@ -1,0 +1,74 @@
+<script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
+<script>
+    const _POST = "POST";
+    const _GET = "GET";
+    const URL_GET_TOKEN = "http://192.168.1.78:8089/realms/master/protocol/openid-connect/token"
+    const URL_SEARCH_GROUP = "http://192.168.1.78:8089/admin/realms/master/groups?search=BOD&first=0&briefRepresentation=false"
+    var accessToken;
+    var refreshToken;
+    $(document).ready(function(){
+      $("#bigClick").click(function(){
+            getOauthToken();
+
+            setTimeout(() => {
+            console.log("Searching groups");
+            searchGroup(accessToken);
+          }, 2367);
+
+        }
+      );
+    });
+
+    function getOauthToken(){
+        let myForm = new FormData();
+        myForm.append("client_id","admin-cli");
+        myForm.append("username","testapi");
+        myForm.append("password","testapi");
+        myForm.append("grant_type","password");
+      $.ajax({
+          url: URL_GET_TOKEN,
+          type: _POST,
+          data: new URLSearchParams(myForm).toString(),
+          processData: false,
+            // contentType: false,
+          contentType: "application/x-www-form-urlencoded",
+          success: function (data) {
+              console.log(data);
+              accessToken = data.access_token;
+              refreshToken = data.refresh_token;
+          },
+          error: function(error){
+            console.log("errorWhen login keycloak");
+          }
+      });
+    }
+
+
+    function searchGroup(accessToken){
+      $.ajax({
+          url: URL_SEARCH_GROUP,
+          type: _GET,
+          headers: {
+            "Authorization": "Bearer " + accessToken
+          },
+          success: function (data) {
+              console.log(data);
+          },
+          error: function(error){
+            console.log("error searchGroup");
+          }
+      });
+    }
+
+</script>
+
+<body>
+<span style="color:#db128b">
+
+</span>
+
+    <hr>
+<h2>TEST 3ds2 qwe</h2>
+<button class="button-19" role="button" id="bigClick"> Search GROUP </button>
+
+</body>
